@@ -1,0 +1,12 @@
+# What CI needs to RUN the test suite. Nothing more.
+#
+# The tests themselves import only the standard library plus `pytest`. That
+# distinction is the one CI #1 got wrong: "the suite is standard library only"
+# is true of the test code and false of the runner. `actions/setup-python`
+# installs a clean interpreter with pip and nothing else, so `python -m pytest`
+# exits 1 with `No module named pytest` before a single test is collected.
+#
+# opencv and reportlab are NOT here on purpose. They are only needed to
+# regenerate the print set, which is committed and checksummed instead. See
+# requirements-print.txt.
+pytest>=7.0

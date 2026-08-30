@@ -25,8 +25,17 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      # No pip install. The test suite is standard library only, on purpose:
-      # regenerating the print set needs opencv and reportlab, and there is no
-      # guarantee of a wheel for every Python in this matrix. The generated
-      # PDFs are committed and checksummed instead. See requirements-print.txt.
+      # requirements.txt is the RUNNER, not the tests. The test code imports
+      # only the standard library and pytest; pytest is not in the standard
+      # library and setup-python does not ship it. opencv and reportlab stay
+      # out of this file -- they only regenerate the print set, which is
+      # committed and checksummed. See requirements-print.txt.
+      - run: pip install -r requirements.txt
+
+      # Its own named step, for the same reason MP1 calls `gcc --version`:
+      # a missing runner must fail here, saying so, rather than as a bare
+      # "No module named pytest" attributed to the test suite.
+      - name: test runner is present
+        run: python -m pytest --version
+
       - run: python -m pytest tests/ -v

@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        # Windows is not optional here. The print set is the deliverable, and
+        # Git rewrites a PDF's line endings on a Windows checkout unless
+        # .gitattributes forbids it -- neither PDF carries a NUL byte in its
+        # first 8000, so Git's own heuristic calls them text. That defect is
+        # invisible on Linux and invisible on the machine that made the files.
+        python-version: ["3.12", "3.14"]
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} / Python ${{ matrix.python-version }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # No pip install. The test suite is standard library only, on purpose:
+      # regenerating the print set needs opencv and reportlab, and there is no
+      # guarantee of a wheel for every Python in this matrix. The generated
+      # PDFs are committed and checksummed instead. See requirements-print.txt.
+      - run: python -m pytest tests/ -v

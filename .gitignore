@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.o
+*.so
+*.exe
+*.dll
+build/
+.venv/
+venv/
+.vscode/
+.DS_Store
+
+# Third-party vendor data -- see docs/THIRD_PARTY.md.
+# Referenced by tools/, never redistributed.
+*.ini
+vendor/
+
+# COLLECTED FRAMES DO NOT GO IN GIT.
+# Git has no delete. A committed JPEG stays in every clone forever, even after
+# a later commit removes it, so 2000 frames would make this repository
+# permanently slow to clone for data that is not the deliverable.
+# data/manifest.csv IS the record and is tracked. The frames are not.
+data/frames/
+*.jpg
+*.jpeg
+!docs/samples/*.jpg

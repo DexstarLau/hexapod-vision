@@ -14,7 +14,11 @@ depends on the other.
 
 ---
 
-## Status — 30 August 2026
+## Status — 10 September 2026
+
+**MP2 is due 31 December 2026.** Collection has not started and the protocol
+budgets September to November for it, so the schedule is the binding constraint
+and not the code.
 
 | | |
 |---|---|
@@ -23,12 +27,31 @@ depends on the other.
 | Collection protocol | done — `docs/` |
 | Manifest template and checker | done — `data/`, `tools/` |
 | Camera calibration | **not started** — needs the printed board |
-| Collection, 40 sessions x 50 frames | **not started** — September to November |
-| Range estimator and error analysis | **not written** |
+| Collection, 40 sessions x 50 frames | **not started** — September to November. **40 x 50 confirmed by the owner, 9 September** |
+| Range estimator and error analysis | working — `vision/range.py`, 27 tests |
+| Held-out evaluation against tape-measure ground truth | **not written** — needs frames |
 
-**19 tests passing, 0 skipped.** Standard library only, so CI needs no
-`pip install` and cannot be broken by a wheel that does not exist yet for a
-Python version in the matrix.
+**46 tests passing, 0 skipped.** Standard library only, so CI needs no
+`pip install` beyond `pytest` and cannot be broken by a wheel that does not exist
+yet for a Python version in the matrix.
+
+**`vision/range.py` was written before any frame exists, deliberately.** Every
+input to `Z = f_px * W_mm / w_px` is a number, and `apparent_width_px` is its
+exact algebraic inverse, so the geometry can be exercised against synthetic values
+whose answer is known in advance. Writing it after collection would mean meeting
+its refusal thresholds on real data, when a refused frame is one that has already
+cost a session.
+
+**It reads `f_px` from a calibration file and will not invent one.** Range is
+linear in `f_px`; a spec-sheet focal length is a range estimate with a silent 20%
+error, and laptop webcams are routinely 10-15 degrees from their quoted field of
+view. A missing value raises rather than defaulting — a plausible number from an
+uncalibrated camera is worse than an exception, because nothing downstream can
+tell it apart from a real one.
+
+**Below 20 px of observed marker width it refuses**; between 20 and 30 it returns
+an estimate carrying a `marginal` label. Those thresholds are the protocol's, not
+this module's.
 
 ---
 
